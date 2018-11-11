@@ -1,6 +1,6 @@
 [views/question]
 version = 7.1.0
-modtime = 1541891476.652034000
+modtime = 1541952896.997134000
 
 [views/result]
 version = 7.1.0
@@ -35,3 +35,14 @@ modtime = 1541909259.316830000
 [views/AllScores]
 version = 7.1.0
 modtime = 1541911395.644671000
+
+[views/event_activity]
+version = 7.1.0
+modtime = 1541912881.316317000
+
+[savedsearches/24hrActivtyReport]
+access = read : [ * ], write : [ admin, ctf_admin ]
+export = system
+owner = admin
+version = 7.1.0
+modtime = 1541912720.923545000

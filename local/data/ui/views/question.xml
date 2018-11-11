@@ -1,4 +1,30 @@
 <dashboard hideEdit="False" hideTitle="false" script="table_icons_inline.js, custom_table_row_expansion.js" stylesheet="table_decorations.css">
+  <search>
+    <query>| inputlookup ctf_questions | search Number=$Number$ </query>
+    <finalized>
+      <condition match=" 'job.resultCount' != 0">
+        <set token="tok_Title">$result.Title$</set>
+        <set token="tok_Question">$result.Question$</set>
+        <set token="tok_Links">$result.Link$</set>
+      </condition>
+    </finalized>
+  </search>
+  <search>
+    <query>
+      |inputlookup ctf_questions 
+| search Number=$Number$
+| eval hide=len(Link)
+| search hide &gt; 0 
+    </query>
+    <finalized>
+      <condition match=" 'job.resultCount' > 0">
+        <set token="tok_ShowLink">Y</set>
+      </condition>
+      <condition>
+        <unset token="tok_ShowLink"/>
+      </condition>
+    </finalized>
+  </search>
   <label>question</label>
   <row>
     <panel>
@@ -9,20 +35,39 @@
              <img height="485" width="101" src="/static/app/SA-ctf_scoreboard/ctflogo.png"/>
           </td>
           <td>
-      		<h1>Submit an Answer to Question $Number$</h1>
+      		<h1>Submit an Answer to Question $Number$ ($tok_Title$)</h1>
           </td>
         </tr>
         </table>
      	 <p/>
       	<div style="padding:10px;border:1px dotted black;">
           <p/>
-      			<h3>$Question$ </h3>
+      			<h3>$tok_Question$ </h3>
           <p/>
 		</div>
+    </html>
+    </panel>
+  </row>
+  <row depends="tok_ShowLink">
+    <panel>
+      <html>
      	 <p/>
-      <form action="/en-US/custom/SA-ctf_scoreboard/scoreboard_controller/submit_question" method="get">
-        <input type="hidden" id="Number" name="Number" value="$Number$"/>
-      <input type="hidden" id="Question" name="Question" value="$Question$"/>
+      	<div>
+          <p/>
+      			<h2>Links</h2>
+      			<a href="$tok_Links$">$tok_Links$</a>
+          <p/>
+		</div>
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <p/>
+        <form action="/en-US/custom/SA-ctf_scoreboard/scoreboard_controller/submit_question" method="get">
+          <input type="hidden" id="Number" name="Number" value="$Number$"/>
+        <input type="hidden" id="Question" name="Question" value="$Question$"/>
         <b>Answer: </b>
           <input type="text" id="Answer" name="Answer"/> 
         <input type="submit" value="Submit"/>
