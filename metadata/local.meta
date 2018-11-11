@@ -19,7 +19,7 @@ access = read : [ * ], write : [ ctf_admin ]
 export = system
 owner = admin
 version = 7.1.0
-modtime = 1541905433.983709000
+modtime = 1541908387.354516000
 
 [macros/coalesce_fields]
 access = read : [ * ], write : [ admin, ctf_admin ]
@@ -27,3 +27,11 @@ export = system
 owner = admin
 version = 7.1.0
 modtime = 1541905662.532154000
+
+[savedsearches/Score-Base]
+version = 7.1.0
+modtime = 1541909259.316830000
+
+[views/AllScores]
+version = 7.1.0
+modtime = 1541911395.644671000
