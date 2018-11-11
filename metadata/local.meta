@@ -1,0 +1,29 @@
+[views/question]
+version = 7.1.0
+modtime = 1541891476.652034000
+
+[views/result]
+version = 7.1.0
+modtime = 1541891532.021897000
+
+[views/welcome]
+version = 7.1.0
+modtime = 1541902686.575171000
+
+[views/questions]
+version = 7.1.0
+modtime = 1541907547.281727000
+
+[macros/append_deduct_hints]
+access = read : [ * ], write : [ ctf_admin ]
+export = system
+owner = admin
+version = 7.1.0
+modtime = 1541905433.983709000
+
+[macros/coalesce_fields]
+access = read : [ * ], write : [ admin, ctf_admin ]
+export = system
+owner = admin
+version = 7.1.0
+modtime = 1541905662.532154000

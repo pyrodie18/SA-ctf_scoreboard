@@ -1,0 +1,127 @@
+<dashboard script="table_icons_inline.js, custom_table_row_expansion.js, instantiate_countdown.js" stylesheet="table_decorations.css, questions.css" hideEdit="false">
+  <label>Questions</label>
+  <row>
+    <panel>
+      <html>
+        <div id="logodiv">
+            <img id="ctflogo" src="/static/app/SA-ctf_scoreboard/ctflogo.png"/>
+        </div>
+      </html>
+    </panel>
+    <panel>
+      <html>
+        <style>
+            .panel-body{
+                 background-color:#f2f4f5 !important;
+             }
+             .dashboard-panel{
+                 background-color:#f2f4f5 !important;
+             }
+        </style>
+          <h3 class="section-heading">User and Team Information</h3>
+          <table border="0">
+            <tr>
+              <td style="font-size: 12px; padding: 5px;">User</td>
+              <td style="font-size: 18px; font-weight: bold; padding: 5px;">$ctf_DisplayUsername$ ($ctf_user$)</td>
+            </tr>
+            <tr>
+              <td style="font-size: 12px; padding: 5px;">Team Name</td>
+              <td style="font-size: 18px; font-weight: bold; padding: 5px;">$ctf_Team$ </td>
+            </tr>
+          </table>
+      </html>
+    </panel>
+    <panel>
+      <html>
+        <h3 class="section-heading"><center>Time Remaining</center></h3>
+        <div id="clock"/>
+        <div id="clock-text">(Days:Hours:Minutes:Seconds)</div>
+      </html>
+    </panel>
+    
+  </row>
+  <row>
+   <panel>
+     <html>
+       <div style="padding:5px;border:1px dotted black;">
+         <h4>
+           <b>Click "&gt;" in the first column of any row below to see your team's entire submission history for that question.</b>
+         </h4>
+       </div>
+     </html>
+   </panel>
+  </row>
+  <row>
+    <panel depends="$a_token_never_seen$">
+      <table>
+        <search>
+          <query>
+          | makeresults
+          | eval user="$env:user$"  `get_user_info`
+          | fields *
+          </query>
+          <earliest>0</earliest>
+          <finalized>
+            <condition match=" 'job.resultCount' = 1">
+              <set token="ctf_user">$result.user$</set>
+              <set token="ctf_DisplayUsername">$result.DisplayUsername$</set>
+              <set token="ctf_Team">$result.Team$</set>
+              <set token="ctf_SearchUrl">$result.SearchUrl$</set>
+            </condition>
+            <condition></condition>
+          </finalized>
+        </search>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table id="table1">
+        <search>
+          <query>index=scoreboard AND (Result="Incorrect" OR Result="Correct" OR Result=Hint OR Result=Bonus) `get_user_info`
+| search 
+    [ | makeresults 
+      | eval user="$env:user$"  `get_user_info`
+      | fields Team] 
+| stats count as Attempts, max(BasePointsAwarded) as BasePointsAwarded, max(SpeedBonusAwarded) as BonusPointsEarned, sum(Penalty) as Penalty, sum(HintPenalty) as HintPenalty max(AdditionalBonusAwarded) as AdditionalBonus, count(eval(Result=="Incorrect")) as IncorrectAttempts, count(eval(Result=="Correct")) as CorrectAttempts by Number 
+| append 
+    [ inputlookup ctf_questions 
+    | eval Attempts = 0 
+    | eval IncorrectAttempts = 0 
+    | eval CorrectAttempts = 0 
+    | fields Number Title Category Question BasePoints Attempts CorrectAttempts IncorrectAttempts] 
+    | appendcols [|inputlookup ctf_config | fields bolDeductHintsOnAnswer]
+    | filldown bolDeductHintsOnAnswer
+    | stats last(Title) as Title, last(BasePoints) as BasePointsAvailable, last(BasePointsAwarded) as BasePointsAwarded, last(SpeedBonusAwarded) as SpeedBonusAwarded, max(AdditionalBonusAwarded) as AdditionalBonusAwarded, sum(Penalty) as Penalty, sum(HintPenalty) as HintPenalty, sum(Attempts) as Attempts, sum(IncorrectAttempts) as IncorrectAttempts, sum(CorrectAttempts) as CorrectAttempts, last(Category) as Category max(bolDeductHintsOnAnswer) as bolDeductHintsOnAnswer by Number
+    | eval Status = if(Attempts = 0,"Unanswered", Status) 
+    | eval Status = if(IncorrectAttempts &gt; 0, "Incorrect", Status) 
+    | eval Status = if(CorrectAttempts &gt; 0, "Correct", Status)
+    `coalesce_fields`
+    | eval modHintPenalty = if((bolDeductHintsOnAnswer = 1) AND (BasePointsAwarded = 0),0,HintPenalty)
+    | eval Score = BasePointsAwarded + SpeedBonusAwarded + AdditionalBonusAwarded - Penalty - modHintPenalty
+    | gethints
+    | fields Number Title Category Status BasePointsAvailable BasePointsAwarded SpeedBonusAwarded AdditionalBonusAwarded Penalty HintPenalty Score HintsAvailable HintsReceived  
+    | rename BasePointsAvailable as "Base Points Avail." 
+    | rename BasePointsAwarded as "Base Points Earned" 
+    | rename SpeedBonusAwarded as "Speed Bonus" 
+    | rename Penalty as "Penalty" 
+    | rename HintsAvailable as "Hints Available"
+    | rename HintsReceived as "Hints Received" 
+    | rename AdditionalBonusAwarded as "Additional Bonus"
+    | rename HintPenalty as "Hint Penalty"
+    | sort Number
+          </query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="wrap">true</option>
+        <drilldown>
+          <link>question?Number=$row.Number$&amp;Question=$row.Question$</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+</dashboard>
