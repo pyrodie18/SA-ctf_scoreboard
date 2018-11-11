@@ -2,7 +2,6 @@
   <view name="welcome" default="true"/>
   <view name="questions" />
   <collection label="Scoring">
-    <view name="top_10_teams" />
     <view name="AllScores" />
     <view name="event_activity" />
     <view name="score_timeline" />
