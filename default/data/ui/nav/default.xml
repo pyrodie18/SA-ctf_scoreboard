@@ -6,8 +6,6 @@
     <view name="event_activity" />
     <view name="score_timeline" />
     <view name="question_timeanswer_densities"/>
-    <view name="individual_score" />
-    <view name="detailed_scoring_breakdown" />
   </collection>
   <view name="rules" />
   <collection label="Help">
