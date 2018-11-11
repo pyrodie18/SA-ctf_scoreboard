@@ -1,4 +1,4 @@
-<dashboard hideEdit="true" hideTitle="false">
+<dashboard hideEdit="false" hideTitle="false">
   <label>Welcome</label>
   <row>
     <panel depends="$a_token_never_seen$">
@@ -28,12 +28,16 @@
       <html>
 		<table>
   <tr>
-    <td>
-      <b><h1> Welcome to the Boss of the SOC (BOTS) Competition</h1></b>
-              <p>BOTS is a Capture the Flag-esque competition where you play the part of a SOC analyst. You are presented <br/>
-              with various questions about multiple security-related scenarios. Some are easy. Some are hard. You will use your <br/>
-              Splunk Search Server, background information and external sources to answer the questions as quickly and accurately as you can.</p>
-              <h1>Your Event Details</h1><p/>
+    <td style="width: 900px;">
+      <b><h1> Welcome to the Army Cyber Skills Challenge (ACSC)</h1></b>
+              <p>Welcome to the 6th annual Army Cyber Skills Challenge (ACSC).  This year's compition is truely bigger than ever. <br/>
+              Remember, this is an individual challenge, there are <b>NO TEAMS!</b>.  Mentors are available to help you out either in person <br/>
+              or remotely on the compition Slack server.  There are no deductions for wrong answers but please don't try to brute force.<br/>
+              (It won't work and will just get you kicked off the system).  Hints are available for a price.  Points won't be deducted for hints <br/>
+              until you have actually answered the question correctly.  All flags will be entered in the <b>ACSC18{&lt;flag&gt;}</b> format. <br/>
+              Don't try to hack any of the remote servers unless the problem specifically states too.  If you have any questions, ask<br/>
+              And most important, <b>HAVE FUN!</b>.</p>
+              <h2>Your Event Details</h2><p/>
               <table border="1">
                 <tr>
                   <td style="font-size: 12px; padding: 10px;">Splunk User</td>
@@ -49,24 +53,18 @@
       <ul>
         <li> <a href="questions">Questions</a>: This is where the magic happens. Submit answers and review your team's previous guesses.
         </li>
-        <li> <a href="top_10_teams">Top 10 Teams</a>: This leaderboard shows the current top ten teams.
-		</li>
         <li> <a href="AllScores">All Teams' Scores</a>: All scores including every team in the competition.
         </li>
         <li> <a href="event_activity">Event Activity</a>: You can view current activity like most active teams, and who's buying hints.
         </li>        
         <li> <a href="rules">Rules</a>: Take a quick look at the event rules if you haven’t already. TL;DR be a good person.
         </li>
-	    <li> Help Menu: Scenarios and other resources that will help you throughout the competition.
-        </li>
       </ul>
         
         <b>* If you need assistance: </b>  
       <ul>
-        <li> Ask any on-site Splunk BOTS Personnel
+        <li> Ask any on-site ACSC Personnel
         </li>
-        <li> Email <a href="mailto:bots@splunk">bots@splunk.com</a>
-		</li>
         <li> Access the Slack channel that was setup for your event
         </li>
       </ul>  

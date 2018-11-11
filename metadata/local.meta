@@ -8,7 +8,7 @@ modtime = 1541891532.021897000
 
 [views/welcome]
 version = 7.1.0
-modtime = 1541902686.575171000
+modtime = 1541965653.633285000
 
 [views/questions]
 version = 7.1.0
@@ -57,3 +57,11 @@ export = system
 owner = admin
 version = 7.1.0
 modtime = 1541956523.430321000
+
+[views/question_timeanswer_densities]
+version = 7.1.0
+modtime = 1541964177.054547000
+
+[views/rules]
+version = 7.1.0
+modtime = 1541966488.757361000

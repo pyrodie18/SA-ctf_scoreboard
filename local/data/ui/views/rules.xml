@@ -1,0 +1,30 @@
+<dashboard hideEdit="false" hideTitle="false">
+  <label>Rules</label>
+  <row>
+    <panel>
+      <html>
+
+<table>
+  <tr>
+    <td style="width: 900px;">
+      <h1> Rules </h1>
+<ol>
+	<li>	The Army Cyber Skills Challenge (ACSC) is an individual challenge.  There are no teams.</li>
+	<li>	Incorrect answers are not penalized.</li>
+  <li>	Hints are available for purchase.  Points for hints will not be deducted until you answer the question correctly.</li>
+	<li>	Mentors are available either in person or on the Slack chat.</li>
+	<li>  Do not attempt to "hack" a remote server unless it is stated so in the question.</li>
+	<li>  Have fun!</li>
+  </ol>
+    </td>
+    <td valign="top">
+		<img height="970" width="202" src="/static/app/SA-ctf_scoreboard/ctflogo.png"></img>
+    </td>
+  </tr>
+  </table> 
+
+     
+      </html>
+    </panel>
+  </row>
+</dashboard>
