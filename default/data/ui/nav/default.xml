@@ -8,10 +8,6 @@
     <view name="question_timeanswer_densities"/>
   </collection>
   <view name="rules" />
-  <collection label="Help">
-    <a href="https://www.splunk.com/content/dam/splunk2/pdfs/solution-guides/splunk-quick-reference-guide.pdf" target="_blank">Splunk Quick Reference Guide</a>
-  </collection>
-  <view name="Credits" />
   <view name="dashboards" />
   <view name="search" />
 </nav>
