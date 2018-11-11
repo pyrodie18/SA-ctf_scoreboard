@@ -36,22 +36,24 @@ require([
                return cell.field === 'Number';
             });
             //update the search with the sourcetype that we are interested in
-            this._searchManager.set({ search: 'earliest=0 index=scoreboard Result=* `get_user_info`  \
+            this._searchManager.set({ search: 'earliest=0 index=scoreboard Result=* `get_user_info` \
                                               | getanswer \
                                               | search [ rest /services/authentication/current-context \
                                                          | rename username as user `get_user_info` \
-                                                         | fields + Team] \
+                                                         | fields + user] \
                                                 Number=' + numberCell.value + ' \
                                               | eval Time = strftime(_time, "%+") \
                                               | fillnull value=0 BasePointsAwarded \
                                               | fillnull value=0 SpeedBonusAwarded \
                                               | fillnull value=0 AdditionalBonusAwarded \
                                               | fillnull value=0 Penalty \
+                                              | fillnull value=0 HintPenalty \
                                               | rename BasePointsAwarded as "Base Points" \
-                                              | rename SpeedBonusAwarded as "Speed Bonus Points" \
-                                              | rename AdditionalBonusAwarded as "Additional Bonus Points" \
+                                              | rename SpeedBonusAwarded as "Speed Bonus" \
+                                              | rename AdditionalBonusAwarded as "Additional Bonus" \
                                               | rename Penalty as "Penalty Points"\
-                                              | table Time user DisplayUsername Team Answer Result "Base Points" "Speed Bonus Points" "Additional Bonus Points" "Penalty Points"\
+                                              | table Time Answer Result "Base Points" "Speed Bonus" "Additional Bonus" "Penalty Points" HintPenalty \
+                                              | rename HintPenalty as "Hint Penalty" \
                                               '
                                             });
             // $container is the jquery object where we can put out content.

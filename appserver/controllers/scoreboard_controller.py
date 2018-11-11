@@ -76,7 +76,8 @@ if not CONF_FILE in parsed_conf_files:
 USER = Config.get('ScoreboardController', 'USER')
 PASSWORD = Config.get('ScoreboardController', 'PASS')
 VKEY = Config.get('ScoreboardController', 'VKEY')
-
+PENALTY = Config.get('ScoreboardController', 'PENALTY')
+ENABLE_SPEED_BONUS = Config.get('ScoreboardController', 'ENABLE_SPEED_BONUS')
 
 class ScoreBoardController(controllers.BaseController):
     '''
@@ -242,6 +243,7 @@ class ScoreBoardController(controllers.BaseController):
 
         adminoutput = collections.OrderedDict()
         partoutput = collections.OrderedDict()
+        
 
         partoutput['user'] = unicode('%s' % (user))
         adminoutput['user'] = unicode('%s' % (user))
@@ -256,14 +258,17 @@ class ScoreBoardController(controllers.BaseController):
         adminoutput['HintNumber'] = unicode('%s' % (submitted_hintnumber_string))
 
         if not already_purchased:
-            partoutput['Penalty'] = unicode('%s' % (penalty_to_return))
-            adminoutput['Penalty'] = unicode('%s' % (penalty_to_return))
+            partoutput['HintPenalty'] = unicode('%s' % (penalty_to_return))
+            adminoutput['HintPenalty'] = unicode('%s' % (penalty_to_return))
         else:
-            partoutput['Penalty'] = unicode('%s' % ('0'))
-            adminoutput['Penalty'] = unicode('%s' % ('0'))
+            partoutput['HintPenalty'] = unicode('%s' % ('0'))
+            adminoutput['HintPenalty'] = unicode('%s' % ('0'))
 
             partoutput['HintAlreadyPurchased'] = unicode('%s' % ('1'))
             adminoutput['HintAlreadyPurchased'] = unicode('%s' % ('1'))
+
+        partoutput['Penalty'] = unicode('%s' % ('0'))
+        adminoutput['Penalty'] = unicode('%s' % ('0'))
 
         partoutput['Question'] = unicode('"%s"' % (question_to_return).replace('"', "'"))
         adminoutput['Question'] = unicode('"%s"' % (question_to_return).replace('"', "'"))
@@ -279,16 +284,16 @@ class ScoreBoardController(controllers.BaseController):
         partoutput['AdditionalBonusAwarded'] = unicode('%s' % ('0'))
         adminoutput['AdditionalBonusAwarded'] = unicode('%s' % ('0'))
 
-        tcode = validatectf.makeTCode(int(time.time()))
-        partoutput['tcode'] = unicode('%s' % (tcode))
-        adminoutput['tcode'] = unicode('%s' % (tcode))
+#        tcode = validatectf.makeTCode(int(time.time()))
+#        partoutput['tcode'] = unicode('%s' % (tcode))
+#        adminoutput['tcode'] = unicode('%s' % (tcode))
 
-        try:
-            vcode = validatectf.makeVCode(VKEY, tcode, partoutput['user'], partoutput['Number'], partoutput['Result'], partoutput['BasePointsAwarded'], partoutput['SpeedBonusAwarded'],partoutput['AdditionalBonusAwarded'],partoutput['Penalty'])
-            partoutput['vcode'] = unicode('%s' % (vcode))
-            adminoutput['vcode'] = unicode('%s' % (vcode))
-        except:
-            logger_admin.exception(unicode('Exception raised in makeVCode'))
+#        try:
+#            vcode = validatectf.makeVCode(VKEY, tcode, partoutput['user'], partoutput['Number'], partoutput['Result'], partoutput['BasePointsAwarded'], partoutput['SpeedBonusAwarded'],partoutput['AdditionalBonusAwarded'],partoutput['Penalty'])
+#            partoutput['vcode'] = unicode('%s' % (vcode))
+#            adminoutput['vcode'] = unicode('%s' % (vcode))
+#        except:
+#            logger_admin.exception(unicode('Exception raised in makeVCode'))
 
         adminoutputlist = []
         partoutputlist = []
@@ -386,8 +391,8 @@ class ScoreBoardController(controllers.BaseController):
 
         for question_dict in question_list:
             if question_dict['Number'] == submitted_number:
-                adminoutput['QuestionOfficial'] = unicode('"%s"' % (question_dict['Question'].replace('"', "'")))
-                partoutput['QuestionOfficial'] = unicode('"%s"' % (question_dict['Question'].replace('"', "'")))
+                adminoutput['Question'] = unicode('"%s"' % (question_dict['Question'].replace('"', "'")))
+                partoutput['Question'] = unicode('"%s"' % (question_dict['Question'].replace('"', "'")))
 
                 adminoutput['BasePointsAvailable'] = unicode('%s' % (question_dict['BasePoints']))
                 partoutput['BasePointsAvailable'] = unicode('%s' % (question_dict['BasePoints']))
@@ -445,19 +450,19 @@ class ScoreBoardController(controllers.BaseController):
                     adminoutput['Penalty'] = unicode('0')
                     partoutput['Penalty'] = unicode('0')
 
-                    tcode = validatectf.makeTCode(int(time.time()))
-                    partoutput['tcode'] = unicode('%s' % (tcode))
-                    adminoutput['tcode'] = unicode('%s' % (tcode))
+#                    tcode = validatectf.makeTCode(int(time.time()))
+#                    partoutput['tcode'] = unicode('%s' % (tcode))
+#                    adminoutput['tcode'] = unicode('%s' % (tcode))
 
-                    try:
-                        vcode = validatectf.makeVCode(VKEY, tcode, partoutput['user'], partoutput['Number'],
-                                                      partoutput['Result'], partoutput['BasePointsAwarded'],
-                                                      partoutput['SpeedBonusAwarded'],
-                                                      partoutput['AdditionalBonusAwarded'], partoutput['Penalty'])
-                        partoutput['vcode'] = unicode('%s' % (vcode))
-                        adminoutput['vcode'] = unicode('%s' % (vcode))
-                    except:
-                        logger_admin.exception(unicode('Exception raised in makeVCode'))
+#                    try:
+#                        vcode = validatectf.makeVCode(VKEY, tcode, partoutput['user'], partoutput['Number'],
+#                                                      partoutput['Result'], partoutput['BasePointsAwarded'],
+#                                                      partoutput['SpeedBonusAwarded'],
+#                                                      partoutput['AdditionalBonusAwarded'], partoutput['Penalty'])
+#                        partoutput['vcode'] = unicode('%s' % (vcode))
+#                        adminoutput['vcode'] = unicode('%s' % (vcode))
+#                    except:
+#                        logger_admin.exception(unicode('Exception raised in makeVCode'))
 
                     adminoutputlist = []
                     partoutputlist = []
@@ -491,19 +496,19 @@ class ScoreBoardController(controllers.BaseController):
                     adminoutput['AdditionalBonusAwarded'] = unicode('0')
                     partoutput['AdditionalBonusAwarded'] = unicode('0')
 
-                    tcode = validatectf.makeTCode(int(time.time()))
-                    partoutput['tcode'] = unicode('%s' % (tcode))
-                    adminoutput['tcode'] = unicode('%s' % (tcode))
+#                    tcode = validatectf.makeTCode(int(time.time()))
+#                    partoutput['tcode'] = unicode('%s' % (tcode))
+#                    adminoutput['tcode'] = unicode('%s' % (tcode))
 
-                    try:
-                        vcode = validatectf.makeVCode(VKEY, tcode, partoutput['user'], partoutput['Number'],
-                                                      partoutput['Result'], partoutput['BasePointsAwarded'],
-                                                      partoutput['SpeedBonusAwarded'],
-                                                      partoutput['AdditionalBonusAwarded'], partoutput['Penalty'])
-                        partoutput['vcode'] = unicode('%s' % (vcode))
-                        adminoutput['vcode'] = unicode('%s' % (vcode))
-                    except:
-                        logger_admin.exception(unicode('Exception raised in makeVCode'))
+#                    try:
+#                        vcode = validatectf.makeVCode(VKEY, tcode, partoutput['user'], partoutput['Number'],
+#                                                      partoutput['Result'], partoutput['BasePointsAwarded'],
+#                                                      partoutput['SpeedBonusAwarded'],
+#                                                      partoutput['AdditionalBonusAwarded'], partoutput['Penalty'])
+#                        partoutput['vcode'] = unicode('%s' % (vcode))
+#                        adminoutput['vcode'] = unicode('%s' % (vcode))
+#                    except:
+#                        logger_admin.exception(unicode('Exception raised in makeVCode'))
 
                     adminoutputlist = []
                     partoutputlist = []
@@ -660,8 +665,14 @@ class ScoreBoardController(controllers.BaseController):
 
         for question_dict in question_list:
             if question_dict['Number'] == submitted_number:
-                adminoutput['QuestionOfficial'] = unicode('"%s"' % (question_dict['Question'].replace('"', "'")))
-                partoutput['QuestionOfficial'] = unicode('"%s"' % (question_dict['Question'].replace('"', "'")))
+                adminoutput['Title'] = unicode('"%s"' % (question_dict['Title'].replace('"', "'")))
+                partoutput['Title'] = unicode('"%s"' % (question_dict['Title'].replace('"', "'")))
+
+                adminoutput['Category'] = unicode('"%s"' % (question_dict['Category'].replace('"', "'")))
+                partoutput['Category'] = unicode('"%s"' % (question_dict['Category'].replace('"', "'")))
+                
+                adminoutput['Question'] = unicode('"%s"' % (question_dict['Question'].replace('"', "'")))
+                partoutput['Question'] = unicode('"%s"' % (question_dict['Question'].replace('"', "'")))
 
                 adminoutput['BasePointsAvailable'] = unicode('%s' % (question_dict['BasePoints']))
                 partoutput['BasePointsAvailable'] = unicode('%s' % (question_dict['BasePoints']))
@@ -697,7 +708,7 @@ class ScoreBoardController(controllers.BaseController):
 
         for answer_dict in answer_list:
             if answer_dict['Number'] == submitted_number:
-                adminoutput['AnswerOfficial'] = unicode('"%s"' % (answer_dict['Answer'].replace('"', "'")))
+                adminoutput['OfficialAnswer'] = unicode('"%s"' % (answer_dict['Answer'].replace('"', "'")))
 
                 if submitted_answer.lower().strip() == answer_dict['Answer'].lower().strip():
 
@@ -712,11 +723,14 @@ class ScoreBoardController(controllers.BaseController):
                         adminoutput['BasePointsAwarded'] = unicode('%s' % (basepoints))
                         partoutput['BasePointsAwarded'] = unicode('%s' % (basepoints))
 
-                        seconds_until_end = int(question_dict['EndTime']) - submitted_time
-                        question_duration = int(question_dict['EndTime']) - int(question_dict['StartTime'])
-                        time_bonus_perc = float(seconds_until_end) / float(question_duration)
-                        time_bonus = float(basepoints) * time_bonus_perc
-                        time_bonus = int(round(time_bonus))
+                        if ENABLE_SPEED_BONUS == '1':
+                            seconds_until_end = int(question_dict['EndTime']) - submitted_time
+                            question_duration = int(question_dict['EndTime']) - int(question_dict['StartTime'])
+                            time_bonus_perc = float(seconds_until_end) / float(question_duration)
+                            time_bonus = float(basepoints) * time_bonus_perc
+                            time_bonus = int(round(time_bonus))
+                        else:
+                            time_bonus = 0
 
                         adminoutput['SpeedBonusAwarded'] = unicode('%s' % (time_bonus))
                         partoutput['SpeedBonusAwarded'] = unicode('%s' % (time_bonus))
@@ -747,24 +761,24 @@ class ScoreBoardController(controllers.BaseController):
                     adminoutput['SpeedBonusAwarded'] = unicode('%s' % ('0'))
                     partoutput['SpeedBonusAwarded'] = unicode('%s' % ('0'))
 
-                    adminoutput['Penalty'] = unicode('%s' % ('10'))
-                    partoutput['Penalty'] = unicode('%s' % ('10'))
+                    adminoutput['Penalty'] = unicode('%s' % (PENALTY))
+                    partoutput['Penalty'] = unicode('%s' % (PENALTY))
 
                 break
 
         adminoutput['AdditionalBonusAwarded'] = unicode('%s' % ('0'))
         partoutput['AdditionalBonusAwarded'] = unicode('%s' % ('0'))
 
-        tcode = validatectf.makeTCode(int(time.time()))
-        partoutput['tcode'] = unicode('%s' % (tcode))
-        adminoutput['tcode'] = unicode('%s' % (tcode))
+#        tcode = validatectf.makeTCode(int(time.time()))
+#        partoutput['tcode'] = unicode('%s' % (tcode))
+#        adminoutput['tcode'] = unicode('%s' % (tcode))
 
-        try:
-            vcode = validatectf.makeVCode(VKEY, tcode, partoutput['user'], partoutput['Number'], partoutput['Result'], partoutput['BasePointsAwarded'], partoutput['SpeedBonusAwarded'],partoutput['AdditionalBonusAwarded'],partoutput['Penalty'])
-            partoutput['vcode'] = unicode('%s' % (vcode))
-            adminoutput['vcode'] = unicode('%s' % (vcode))
-        except:
-            logger_admin.exception(unicode('Exception raised in makeVCode'))
+#        try:
+#            vcode = validatectf.makeVCode(VKEY, tcode, partoutput['user'], partoutput['Number'], partoutput['Result'], partoutput['BasePointsAwarded'], partoutput['SpeedBonusAwarded'],partoutput['AdditionalBonusAwarded'],partoutput['Penalty'])
+#            partoutput['vcode'] = unicode('%s' % (vcode))
+#            adminoutput['vcode'] = unicode('%s' % (vcode))
+#        except:
+#            logger_admin.exception(unicode('Exception raised in makeVCode'))
 
         adminoutputlist = []
         partoutputlist = []
@@ -837,8 +851,8 @@ class ScoreBoardController(controllers.BaseController):
 
         for question_dict in question_list:
             if question_dict['Number'] == submitted_number:
-                adminoutput['QuestionOfficial'] = unicode('"%s"' % (question_dict['Question'].replace('"', "'")))
-                partoutput['QuestionOfficial'] = unicode('"%s"' % (question_dict['Question'].replace('"', "'")))
+                adminoutput['Question'] = unicode('"%s"' % (question_dict['Question'].replace('"', "'")))
+                partoutput['Question'] = unicode('"%s"' % (question_dict['Question'].replace('"', "'")))
 
                 adminoutput['BasePointsAvailable'] = unicode('%s' % (question_dict['BasePoints']))
                 partoutput['BasePointsAvailable'] = unicode('%s' % (question_dict['BasePoints']))
@@ -888,16 +902,16 @@ class ScoreBoardController(controllers.BaseController):
         partoutput['Penalty'] = unicode('%s' % ('0'))
         adminoutput['Penalty'] = unicode('%s' % ('0'))
 
-        tcode = validatectf.makeTCode(int(time.time()))
-        partoutput['tcode'] = unicode('%s' % (tcode))
-        adminoutput['tcode'] = unicode('%s' % (tcode))
+#        tcode = validatectf.makeTCode(int(time.time()))
+#        partoutput['tcode'] = unicode('%s' % (tcode))
+#        adminoutput['tcode'] = unicode('%s' % (tcode))
 
-        try:
-            vcode = validatectf.makeVCode(VKEY, tcode, partoutput['user'], partoutput['Number'], partoutput['Result'], partoutput['BasePointsAwarded'], partoutput['SpeedBonusAwarded'],partoutput['AdditionalBonusAwarded'],partoutput['Penalty'])
-            partoutput['vcode'] = unicode('%s' % (vcode))
-            adminoutput['vcode'] = unicode('%s' % (vcode))
-        except:
-            logger_admin.exception(unicode('Exception raised in makeVCode'))
+#        try:
+#            vcode = validatectf.makeVCode(VKEY, tcode, partoutput['user'], partoutput['Number'], partoutput['Result'], partoutput['BasePointsAwarded'], partoutput['SpeedBonusAwarded'],partoutput['AdditionalBonusAwarded'],partoutput['Penalty'])
+#            partoutput['vcode'] = unicode('%s' % (vcode))
+#            adminoutput['vcode'] = unicode('%s' % (vcode))
+#        except:
+#            logger_admin.exception(unicode('Exception raised in makeVCode'))
 
         adminoutputlist = []
         partoutputlist = []
