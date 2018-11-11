@@ -1,0 +1,28 @@
+<dashboard hideEdit="false" refresh="120">
+  <label>Score Timeline</label>
+  <search id="base" ref="Score-Base"></search>
+  <row>
+    <panel>
+      <html>
+      
+        <title>Scoring Timeline</title>
+        
+        <img src="/static/app/SA-ctf_scoreboard/ctflogo.png" width="200" align="left" hspace="20"/>
+      
+        <h1 style="font-size:50pt;text-align:center;position:absolute;top:50%;left:50%;transform:translateX(-50%)translateY(-50%);">
+          Scoring Timeline
+        </h1>
+        <br/>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <search ref="Scoring Timeline"></search>
+        <option name="charting.drilldown">none</option>
+        <option name="height">500</option>
+      </chart>
+    </panel>
+  </row>
+</dashboard>

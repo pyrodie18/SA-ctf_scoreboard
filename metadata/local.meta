@@ -46,3 +46,14 @@ export = system
 owner = admin
 version = 7.1.0
 modtime = 1541912720.923545000
+
+[views/score_timeline]
+version = 7.1.0
+modtime = 1541956633.343922000
+
+[savedsearches/Scoring%20Timeline]
+access = read : [ * ], write : [ admin, ctf_admin ]
+export = system
+owner = admin
+version = 7.1.0
+modtime = 1541956523.430321000
