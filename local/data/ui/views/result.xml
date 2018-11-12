@@ -1,4 +1,4 @@
-<dashboard script="result.js" stylesheet="result.css" hideEdit="false" hideTitle="True">
+<dashboard script="result.js" stylesheet="result.css" hideEdit="false" hideTitle="false">
   <label>result</label>
   <row>
     <panel>
@@ -51,7 +51,7 @@
             
      	<p/>
         <h3> Response Details </h3>
-        Question: $QuestionOfficial$<br/>
+        Question: $Question$<br/>
         Number: $Number$<br/>
 		User: $user$<br/>
 		Base points available: $BasePointsAvailable$<br/>
