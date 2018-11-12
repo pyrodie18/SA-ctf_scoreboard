@@ -33,23 +33,24 @@
     </panel>
     <panel>
       <html>
-        <h3 class="section-heading"><center>Time Remaining</center></h3>
+        <h3 class="section-heading">
+          <center>Time Remaining</center>
+        </h3>
         <div id="clock"/>
         <div id="clock-text">(Days:Hours:Minutes:Seconds)</div>
       </html>
     </panel>
-    
   </row>
   <row>
-   <panel>
-     <html>
+    <panel>
+      <html>
        <div style="padding:5px;border:1px dotted black;">
          <h4>
            <b>Click "&gt;" in the first column of any row below to see your team's entire submission history for that question.</b>
          </h4>
        </div>
      </html>
-   </panel>
+    </panel>
   </row>
   <row>
     <panel depends="$a_token_never_seen$">
@@ -119,7 +120,7 @@
         <option name="drilldown">row</option>
         <option name="wrap">true</option>
         <drilldown>
-          <link>question?Number=$row.Number$&amp;Question=$row.Question$</link>
+          <link target="_self">/app/SA-ctf_scoreboard/question?Number=$row.Number$</link>
         </drilldown>
       </table>
     </panel>

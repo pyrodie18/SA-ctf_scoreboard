@@ -1,0 +1,8 @@
+.panel-title {
+    font-weight: bolder !important;
+    text-align: center;
+}
+
+th.sorts a {
+    font-weight: bolder;
+}
