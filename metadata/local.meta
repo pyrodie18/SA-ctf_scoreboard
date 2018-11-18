@@ -1,6 +1,9 @@
 [views/question]
+access = write : [ admin, ctf_admin ]
+export = none
+owner = admin
 version = 7.1.0
-modtime = 1541992006.554517000
+modtime = 1542394894.817936000
 
 [views/result]
 version = 7.1.0
@@ -8,11 +11,11 @@ modtime = 1541986094.906600000
 
 [views/welcome]
 version = 7.1.0
-modtime = 1541965653.633285000
+modtime = 1542255026.721957000
 
 [views/questions]
 version = 7.1.0
-modtime = 1541992228.544218000
+modtime = 1542303975.295519000
 
 [macros/append_deduct_hints]
 access = read : [ * ], write : [ ctf_admin ]
@@ -30,37 +33,49 @@ modtime = 1541905662.532154000
 
 [savedsearches/Score-Base]
 version = 7.1.0
-modtime = 1541909259.316830000
+modtime = 1542244685.517745000
 
 [views/AllScores]
+access = read : [ admin, ctf_admin, ctf_competitor ], write : [ admin, ctf_admin ]
+export = none
+owner = nobody
 version = 7.1.0
-modtime = 1541911395.644671000
+modtime = 1542397529.565819000
 
 [views/event_activity]
+access = read : [ admin, ctf_admin ], write : [ admin, ctf_admin ]
+export = none
+owner = nobody
 version = 7.1.0
-modtime = 1541912881.316317000
+modtime = 1542389900.850499000
 
 [savedsearches/24hrActivtyReport]
 access = read : [ * ], write : [ admin, ctf_admin ]
 export = system
 owner = admin
 version = 7.1.0
-modtime = 1541912720.923545000
+modtime = 1542244694.667244000
 
 [views/score_timeline]
+access = read : [ admin, ctf_admin ], write : [ admin, ctf_admin ]
+export = none
+owner = nobody
 version = 7.1.0
-modtime = 1541956633.343922000
+modtime = 1542389917.841112000
 
 [savedsearches/Scoring%20Timeline]
 access = read : [ * ], write : [ admin, ctf_admin ]
 export = system
 owner = admin
 version = 7.1.0
-modtime = 1541956523.430321000
+modtime = 1542244704.483200000
 
 [views/question_timeanswer_densities]
+access = read : [ admin, ctf_admin ], write : [ admin, ctf_admin ]
+export = none
+owner = nobody
 version = 7.1.0
-modtime = 1541964177.054547000
+modtime = 1542389992.385245000
 
 [views/rules]
 version = 7.1.0
@@ -72,3 +87,17 @@ export = system
 owner = nobody
 version = 7.1.0
 modtime = 1541971021.575014000
+
+[views/question_investigator]
+access = read : [ admin, ctf_admin, ctf_answers_service, ctf_mentor ]
+export = none
+owner = admin
+version = 7.1.0
+modtime = 1542326866.979178000
+
+[views/user_investigator]
+access = read : [ admin, ctf_admin, ctf_mentor ]
+export = none
+owner = admin
+version = 7.1.0
+modtime = 1542327449.966934000

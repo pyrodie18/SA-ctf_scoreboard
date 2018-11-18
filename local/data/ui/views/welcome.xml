@@ -30,12 +30,12 @@
   <tr>
     <td style="width: 900px;">
       <b><h1> Welcome to the Army Cyber Skills Challenge (ACSC)</h1></b>
-              <p>Welcome to the 6th annual Army Cyber Skills Challenge (ACSC).  This year's compition is truely bigger than ever. <br/>
+              <p>Welcome to the 6th annual Army Cyber Skills Challenge (ACSC).  This year's competition is truly bigger than ever. <br/>
               Remember, this is an individual challenge, there are <b>NO TEAMS!</b>.  Mentors are available to help you out either in person <br/>
-              or remotely on the compition Slack server.  There are no deductions for wrong answers but please don't try to brute force.<br/>
+              or remotely on the competition Slack server.  There are no deductions for wrong answers but please don't try to brute force.<br/>
               (It won't work and will just get you kicked off the system).  Hints are available for a price.  Points won't be deducted for hints <br/>
-              until you have actually answered the question correctly.  All flags will be entered in the <b>ACSC18{&lt;flag&gt;}</b> format. <br/>
-              Don't try to hack any of the remote servers unless the problem specifically states too.  If you have any questions, ask<br/>
+              until you have actually answered the question correctly.  All flags will be entered in the <b>acsc18{&lt;flag&gt;}</b> format. <br/>
+              Don't try to hack any of the remote servers unless the problem specifically states to.  If you have any questions, ask<br/>
               And most important, <b>HAVE FUN!</b>.</p>
               <h2>Your Event Details</h2><p/>
               <table border="1">

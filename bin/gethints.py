@@ -50,6 +50,7 @@ class getanswerCommand(StreamingCommand):
         try:
             myteam
         except NameError:
+            logger_admin.exception('Error assigning team.')
             myteam = user
 
         '''

@@ -1,18 +1,22 @@
-<dashboard hideTitle="False" refresh="30">
+<dashboard hideTitle="False" hideEdit="true">
   <label>All Player Scores</label>
-  <search id="base" ref="Score-Base"></search>
-  <search base="base" id="secondary">
-    <query>
-      | stats max(BasePointsAwarded) as BasePointsAwarded, max(SpeedBonusAwarded) as SpeedBonusAwarded, max(AdditionalBonusAwarded) as AdditionalBonusAwarded, max(Penalty) as Penalty, max(HintPenalty) as HintPenalty by user
-      | stats sum(BasePointsAwarded) as BasePointsAwarded, sum(SpeedBonusAwarded) as SpeedBonusAwarded, sum(AdditionalBonusAwarded) as AdditionalBonusAwarded, sum(Penalty) as Penalty, sum(HintPenalty) as HintPenalty by user
-      | eval Score = BasePointsAwarded + SpeedBonusAwarded + AdditionalBonusAwarded - Penalty - HintPenalty
-      | sort - Score 
+  <search id="secondary">
+    <query>earliest=0 index=scoreboard user!=admin user=* `get_user_info` 
+`coalesce_fields`
+| stats max(BasePointsAvailable) as BasePointsAvailable max(BasePointsAwarded) as BasePointsAwarded max(SpeedBonusAwarded) as SpeedBonusAwarded max(AdditionalBonusAwarded) as AdditionalBonusAwarded sum(Penalty) as Penalty, sum(HintPenalty) as HintPenalty by user, Number
+| eval HintPenalty = if(BasePointsAwarded &lt; 1, 0, HintPenalty)
+| stats sum(BasePointsAvailable) as BasePointsAvailable sum(BasePointsAwarded) as BasePointsAwarded sum(SpeedBonusAwarded) as SpeedBonusAwarded sum(AdditionalBonusAwarded) as AdditionalBonusAwarded sum(Penalty) as Penalty, sum(HintPenalty) as HintPenalty by user
+| eval Score = BasePointsAwarded + SpeedBonusAwarded + AdditionalBonusAwarded - Penalty - HintPenalty
+| sort - Score 
       | streamstats count as Rank
       | eval panel = floor(Rank / 10)
       `get_user_info`
       | fields Rank Team Score panel
-    </query>
-  </search>
+      </query>
+          <earliest>0</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
   <row>
     <panel>
       <html>

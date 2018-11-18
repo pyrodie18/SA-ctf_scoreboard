@@ -1,4 +1,4 @@
-<dashboard hideEdit="False" hideTitle="false" script="table_icons_inline.js, custom_table_row_expansion.js" stylesheet="table_decorations.css">
+<dashboard hideEdit="true" hideTitle="false" script="table_icons_inline.js, custom_table_row_expansion.js" stylesheet="table_decorations.css">
   <search>
     <query>| inputlookup ctf_questions | search Number=$Number$ </query>
     <finalized>
@@ -81,10 +81,17 @@
     <panel>
       <table id="table1">
         <search>
-          <query>
-            index=scoreboard user=$env:user$ Number=$Number$
+          <query>index=scoreboard user=$env:user$ Number=$Number$
             | stats count as Attempts, max(BasePointsAvailable) as BasePointsAvailable max(BasePointsAwarded) as BasePointsAwarded, max(SpeedBonusAwarded) as SpeedBonusAwarded, max(AdditionalBonusAwarded) as AdditionalBonusAwarded, sum(Penalty) as Penalty sum(HintPenalty) as HintPenalty count(eval(Result=="Incorrect")) as IncorrectAttempts, count(eval(Result=="Correct")) as CorrectAttempts by Number
-            | gethints
+            | lookup ctf_questions Number OUTPUT BasePoints as BasePointsAvailable
+            |appendcols [| inputlookup ctf_hint_entitlements
+| eval Purchased = 1
+| search user = $env:user$
+| append [|inputlookup ctf_hints]
+| stats values(Hint) as Hint, max(HintCost) as HintCost, max(Purchased) as Purchased by HintNumber, Number
+| stats sum(Purchased) as HintsReceived count as HintsAvailable by Number
+| search Number = $Number$
+| fields - Number]
             | eval Status = if(Attempts = 0,"Unanswered", Status) 
             | eval Status = if(IncorrectAttempts &gt; 0, "Incorrect", Status) 
             | eval Status = if(CorrectAttempts &gt; 0, "Correct", Status)
@@ -99,14 +106,14 @@
             | rename BonusPointsEarned as "Bonus Points Earned" 
             | rename Penalty as "Penalty Points" 
             | rename HintsAvailable as "Hints Available"
-            | rename HintsReceived as "Hints Received"
-          </query>
+            | rename HintsReceived as "Hints Received"</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
         </search>
         <option name="count">50</option>
         <option name="dataOverlayMode">none</option>
         <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
         <option name="wrap">true</option>
         <drilldown>
           <link>question?Number=$row.Number$&amp;Question=$row.Question$</link>
@@ -131,21 +138,22 @@
     <panel>
       <table>
         <search>
-          <query>
-            index="scoreboard_admin" user=$env:user$ Number=$Number$
-            | gethints
-            | stats values(Hints) as Hints by Number
-            | mvexpand Hints
-            | spath input=Hints
-            | eval Number=mvdedup(Number)
-            | fields Number HintNumber HintCost Hint 
-            | sort Number HintNumber 
-            | rename HintCost as "Hint Cost"
-          </query>
+          <query>| inputlookup ctf_hint_entitlements
+            | eval Purchased = 1
+            | search user = $env:user$
+            | append [|inputlookup ctf_hints]
+            | search Number = $Number$
+            | eval Purchased = coalesce(Purchased,0)
+            | stats values(Hint) as Hint, max(HintCost) as HintCost, max(Purchased) as Purchased by Number, HintNumber
+            | eval Hint = if(Purchased = 0, "You Can Purchase This Hint", Hint)
+            | table Number, HintNumber, HintCost, Hint</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
         </search>
         <option name="drilldown">row</option>
+        <option name="refresh.display">progressbar</option>
         <drilldown>
-          <link>/custom/SA-ctf_scoreboard/scoreboard_controller/purchase_hint?Number=$row.Number$&amp;HintNumber=$row.HintNumber$&amp;Question=$Question$</link>
+          <link target="_self">/custom/SA-ctf_scoreboard/scoreboard_controller/purchase_hint?Number=$row.Number$&amp;HintNumber=$row.HintNumber$</link>
         </drilldown>
       </table>
     </panel>

@@ -1,4 +1,4 @@
-<dashboard script="table_icons_inline.js, custom_table_row_expansion.js, instantiate_countdown.js" stylesheet="table_decorations.css, questions.css" hideEdit="false">
+<dashboard script="table_icons_inline.js, custom_table_row_expansion.js, instantiate_countdown.js" stylesheet="table_decorations.css, questions.css" hideEdit="true">
   <label>Questions</label>
   <row>
     <panel>
@@ -79,7 +79,7 @@
     <panel>
       <table id="table1">
         <search>
-          <query>index=scoreboard AND (Result="Incorrect" OR Result="Correct" OR Result=Hint OR Result=Bonus) `get_user_info`
+          <query>index=scoreboard AND (Result="Incorrect" OR Result="Correct" OR Result=Hint OR Result=Bonus) user=$env:user$  `get_user_info`
 | search 
     [ | makeresults 
       | eval user="$env:user$"  `get_user_info`
@@ -100,7 +100,13 @@
     `coalesce_fields`
     | eval modHintPenalty = if((bolDeductHintsOnAnswer = 1) AND (BasePointsAwarded = 0),0,HintPenalty)
     | eval Score = BasePointsAwarded + SpeedBonusAwarded + AdditionalBonusAwarded - Penalty - modHintPenalty
-    | gethints
+    | append [| inputlookup ctf_hint_entitlements
+| eval Purchased = 1
+| search user = $env:user$
+| append [|inputlookup ctf_hints]
+| stats values(Hint) as Hint, max(HintCost) as HintCost, max(Purchased) as Purchased by HintNumber, Number
+| stats sum(Purchased) as HintsReceived count as HintsAvailable by Number]
+| stats values(Title) as Title, last(BasePointsAvailable) as BasePointsAvailable, last(BasePointsAwarded) as BasePointsAwarded, last(SpeedBonusAwarded) as SpeedBonusAwarded, max(AdditionalBonusAwarded) as AdditionalBonusAwarded, sum(Penalty) as Penalty, sum(HintPenalty) as HintPenalty, sum(Attempts) as Attempts, sum(IncorrectAttempts) as IncorrectAttempts, sum(CorrectAttempts) as CorrectAttempts, last(Category) as Category max(bolDeductHintsOnAnswer) as bolDeductHintsOnAnswer max(HintsAvailable) as HintsAvailable, max(HintsReceived) as HintsReceived, last(Status) as Status last(Score) as Score by Number
     | fields Number Title Category Status BasePointsAvailable BasePointsAwarded SpeedBonusAwarded AdditionalBonusAwarded Penalty HintPenalty Score HintsAvailable HintsReceived  
     | rename BasePointsAvailable as "Base Points Avail." 
     | rename BasePointsAwarded as "Base Points Earned" 
@@ -110,14 +116,14 @@
     | rename HintsReceived as "Hints Received" 
     | rename AdditionalBonusAwarded as "Additional Bonus"
     | rename HintPenalty as "Hint Penalty"
-    | sort Number
-          </query>
+    | sort Number</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
         </search>
         <option name="count">100</option>
         <option name="dataOverlayMode">none</option>
         <option name="drilldown">row</option>
+        <option name="refresh.display">progressbar</option>
         <option name="wrap">true</option>
         <drilldown>
           <link target="_self">/app/SA-ctf_scoreboard/question?Number=$row.Number$</link>

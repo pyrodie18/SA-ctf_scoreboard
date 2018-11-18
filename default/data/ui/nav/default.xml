@@ -8,6 +8,4 @@
     <view name="question_timeanswer_densities"/>
   </collection>
   <view name="rules" />
-  <view name="dashboards" />
-  <view name="search" />
 </nav>

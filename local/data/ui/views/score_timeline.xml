@@ -1,6 +1,5 @@
-<dashboard hideEdit="false" refresh="120">
+<dashboard hideEdit="true" refresh="120">
   <label>Score Timeline</label>
-  <search id="base" ref="Score-Base"></search>
   <row>
     <panel>
       <html>
@@ -19,9 +18,56 @@
   <row>
     <panel>
       <chart>
-        <search ref="Scoring Timeline"></search>
+        <search>
+          <query>index=scoreboard user!=admin user=* `get_user_info` 
+`append_deduct_hints`
+`coalesce_fields`
+| sort number, _time
+| streamstats max(BasePointsAvailable) as BasePointsAvailable max(BasePointsAwarded) as BasePointsAwarded max(SpeedBonusAwarded) as SpeedBonusAwarded max(AdditionalBonusAwarded) as AdditionalBonusAwarded sum(Penalty) as Penalty, sum(HintPenalty) as HintPenalty by user, Number
+| eval HintPenalty = if ((bolDeductHintsOnAnswer = 1) AND (BasePointsAwarded &lt; 1), 0, HintPenalty)
+| eval QuestionScore = BasePointsAwarded + SpeedBonusAwarded + AdditionalBonusAwarded - Penalty - HintPenalty |  sort  _time 
+            | streamstats window=1 current=false last(QuestionScore) as PreviousScore by user Number
+                        | eval PreviousScore = coalesce(PreviousScore,0)
+            | eval PointChange = QuestionScore - PreviousScore
+            | streamstats sum(PointChange) as cumScore by user
+            | timechart span=30m limit=10 useother=false last(cumScore) by DisplayUsername
+            | filldown</query>
+          <earliest>-1d</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.abbreviation">none</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.abbreviation">none</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.abbreviation">none</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
         <option name="charting.drilldown">none</option>
-        <option name="height">500</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.lineWidth">2</option>
+        <option name="height">451</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
       </chart>
     </panel>
   </row>
