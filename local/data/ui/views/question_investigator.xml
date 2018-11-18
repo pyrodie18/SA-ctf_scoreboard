@@ -1,0 +1,182 @@
+<form script="tabs.js" stylesheet="question_investigator.css">
+  <label>Question Investigator</label>
+  <search id="base_search">
+    <query>
+      earliest=0 index=scoreboard_admin  $QuestionNum$ `get_user_info` | fields user, Result, Number, Answer
+    </query>
+    <earliest>0</earliest>
+    <latest>now</latest>
+    <done>
+      <set token="tokHTML">$result.data$</set>
+    </done>
+  </search>
+  <fieldset submitButton="false">
+    <input type="dropdown" token="QuestionNum" searchWhenChanged="true">
+      <label>Question</label>
+      <prefix>Number=</prefix>
+      <fieldForLabel>Title</fieldForLabel>
+      <fieldForValue>Number</fieldForValue>
+      <search>
+        <query>
+          | inputlookup ctf_questions
+          | fields Title, Number
+          | eval LowerName = lower(Title)
+          | sort LowerName
+          </query>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </search>
+    </input>
+  </fieldset>
+  <row id="tabs">
+    <panel>
+      <html>
+                                <ul id="tabs" class="nav nav-tabs">
+          <li class="active">
+            <a href="#" class="toggle-tab" data-toggle="tab" data-elements="question_basic_stats,stats_tables" data-token="control_token_non_internal">Information</a>
+          </li>
+                                        <li>
+                                                <a href="#" class="toggle-tab" data-toggle="tab" data-elements="Answer,Hints" data-token="control_token_internal">Answers</a>
+                                        </li>
+                                </ul>
+                        </html>
+    </panel>
+  </row>
+  <row id="question_basic_stats">
+    <panel id="question">
+      <title>Question</title>
+      <table>
+        <search>
+          <query>
+            | inputlookup ctf_questions
+            | search $QuestionNum$
+            | fields Question
+          </query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel id="users_attempted">
+      <title>Users Attempted</title>
+      <single>
+        <search base="base_search">
+          <query>| stats dc(user) as "Users Who Attempted"</query>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+    <panel id="users_correct">
+      <title>Users with Correct Answer</title>
+      <single>
+        <search base="base_search">
+          <query>| search (Result="Correct")
+| stats dc(user) as "Users Who Completed"</query>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+  </row>
+ <row id="Answer">
+    <panel>
+      <title>Answer</title>
+      <table>
+        <search>
+          <query>
+            | inputlookup ctf_answers
+            | search $QuestionNum$
+            | fields Answer
+          </query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row id="Hints">
+    <panel>
+      <title>Hints</title>
+      <table>
+        <search>
+          <query>
+            | inputlookup ctf_hints
+            | search $QuestionNum$
+            | sort HintNumber
+            | table Hint, HintNumber, HintCost
+            | rename HintNumber as "Hint Number", HintCost as "Cost"
+          </query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+ <row id="stats_tables">
+    <panel>
+      <title>User Attempts</title>
+      <table>
+        <search base="base_search">
+          <query>
+            | eval Correct=if(Result="Correct", 1, 0)
+            | eval Incorrect=if(Result="Incorrect", 1, 0)
+            | eval Hint=if(Result="Hint", 1, 0)
+            | append [|inputlookup ctf_users | fields Username | rename Username as user]
+            | stats max(Correct) as Correct, max(Incorrect) as Incorrect, max(Hint) as Hint by user
+            | fillnull value=0
+            | lookup ctf_users Username as user OUTPUT DisplayUsername
+            | eval Attempt = Correct + Incorrect + Hint
+            | eval Attempt = if(Attempt &gt;=1, 1, 0)
+            | table DisplayUsername, Attempt, Correct, Incorrect, Hint
+            | eval LowerName = lower(DisplayUsername)
+            | sort LowerName
+            | fields - LowerName
+          </query>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Incorrect Answers</title>
+      <table>
+        <search base="base_search">
+          <query>
+            | search Result="Incorrect"
+            | stats count as  NumOfTimes dc(user) as NumOfUsers by Answer
+            | sort - NumOfUsers, - NumOfTimes
+            | rename Answer as "Incorrect Answer", NumOfTimes as "# of Times Given", NumOfUsers as "# of Players"
+          </query>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+</form>

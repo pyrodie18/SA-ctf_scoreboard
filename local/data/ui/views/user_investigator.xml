@@ -1,0 +1,189 @@
+<form script="tabs.js" stylesheet="tabs.css">
+  <label>User Investigator</label>
+  <description>Deep Dive a User, ostensibly to help them</description>
+  <search id="filtered_base">
+    <query>
+      earliest=0 index=scoreboard_admin user=* `get_user_info` 
+`append_deduct_hints`
+`coalesce_fields`
+| sort number, _time
+| streamstats max(BasePointsAvailable) as BasePointsAvailable max(BasePointsAwarded) as BasePointsAwarded max(SpeedBonusAwarded) as SpeedBonusAwarded max(AdditionalBonusAwarded) as AdditionalBonusAwarded sum(Penalty) as Penalty, sum(HintPenalty) as HintPenalty by user, Number
+| eval HintPenalty = if ((bolDeductHintsOnAnswer = 1) AND (BasePointsAwarded &lt; 1), 0, HintPenalty)
+| eval QuestionScore = BasePointsAwarded + SpeedBonusAwarded + AdditionalBonusAwarded - Penalty - HintPenalty
+      | search user="$tok_user$" 
+      | fields BasePointsAwarded, SpeedBonusAwarded, AdditionalBonusAwarded, Penalty, HintPenalty, user, DisplayUsername, Number, Result, Answer, OfficialAnswer
+    </query>
+  </search>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="dropdown" token="tok_user" searchWhenChanged="true">
+      <search id="base_0">
+        <query>| inputlookup ctf_users | fields DisplayUsername, Username | dedup Username | sort DisplayUsername | rename Username as user</query>
+        <earliest>0</earliest>
+      </search>
+      <label>User</label>
+      <fieldForLabel>DisplayUsername</fieldForLabel>
+      <fieldForValue>user</fieldForValue>
+      <selectFirstChoice>true</selectFirstChoice>
+    </input>
+  </fieldset>
+  <row id="tabs">
+    <panel>
+      <html>
+				<ul id="tabs" class="nav nav-tabs">
+          <li class="active">
+            <a href="#" class="toggle-tab" data-toggle="tab" data-elements="stats1,stats2,player_actions" data-token="control_token_non_internal">General Information</a>
+          </li>
+					<li>
+						<a href="#" class="toggle-tab" data-toggle="tab" data-elements="player_timeline" data-token="control_token_internal">Player Timeline</a>
+					</li>
+				</ul>
+			</html>
+    </panel>
+  </row>
+  <row id="stats1">
+    <panel>
+      <title>Current Rank (Player)</title>
+      <single>
+        <search base="base">
+          <query> 
+            | stats max(BasePointsAwarded) as BasePointsAwarded, max(SpeedBonusAwarded) as SpeedBonusAwarded, max(AdditionalBonusAwarded) as AdditionalBonusAwarded, max(Penalty) as Penalty, max(HintPenalty) as HintPenalty by user, DisplayUsername, Number
+            | stats sum(BasePointsAwarded) as BasePointsAwarded, sum(SpeedBonusAwarded) as SpeedBonusAwarded, sum(AdditionalBonusAwarded) as AdditionalBonusAwarded, sum(Penalty) as Penalty, sum(HintPenalty) as HintPenalty by user, DisplayUsername
+            | eval Score = BasePointsAwarded + SpeedBonusAwarded + AdditionalBonusAwarded - Penalty - HintPenalty
+            | sort - Score 
+            | streamstats count as Rank
+            | search user = "$tok_user$"
+            | fields Rank  
+          </query>
+        </search>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="underLabel">Place</option>
+        <option name="useColors">0</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Current Score (Player)</title>
+      <single>
+        <search base="filtered_base">
+          <query>
+            | stats max(BasePointsAwarded) as BasePointsAwarded, max(SpeedBonusAwarded) as SpeedBonusAwarded, max(AdditionalBonusAwarded) as AdditionalBonusAwarded, max(Penalty) as Penalty, max(HintPenalty) as HintPenalty by  Number
+            | stats sum(BasePointsAwarded) as BasePointsAwarded, sum(SpeedBonusAwarded) as SpeedBonusAwarded, sum(AdditionalBonusAwarded) as AdditionalBonusAwarded, sum(Penalty) as Penalty, sum(HintPenalty) as HintPenalty 
+            | eval Score = BasePointsAwarded + SpeedBonusAwarded + AdditionalBonusAwarded - Penalty - HintPenalty
+            | fields Score
+          </query>
+        </search>
+        <option name="refresh.display">progressbar</option>
+        <option name="underLabel">Points</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Questions Answered</title>
+      <single>
+        <search base="filtered_base">
+          <query>
+            | search Result="Correct"
+            | stats dc(Number) as numquestions
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Questions Attempted</title>
+      <single>
+        <search base="filtered_base">
+          <query>
+            | stats dc(Number) as numquestions
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </single>
+    </panel>
+  </row>
+  <row id="stats2">
+    <panel>
+      <title>Average Time to Answer</title>
+      <single>
+        <search base="filtered_base">
+          <query>
+            | streamstats window=2 current=t global=f earliest(_time) as curr, latest(_time) as next 
+            | eventstats count as totalcount| eval delta=next-curr 
+            | stats avg(delta) as avgquestiontime 
+            | eval avgquestiontime=round(avgquestiontime,0)
+          </query>
+        </search>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="rangeValues">[300,600,900,1200]</option>
+        <option name="underLabel">seconds</option>
+        <option name="useColors">0</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Minutes Played</title>
+      <single>
+        <search base="filtered_base">
+          <query>
+            | stats earliest(_time) as firsttime,latest(_time) as lasttime 
+            | eval totaltime=lasttime-firsttime 
+            | fields totaltime  
+            | eval totaltime=totaltime/60 
+            | eval totaltime=round(totaltime,0)</query>
+        </search>
+        <option name="underLabel">minutes</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Most Incorrectly Answered</title>
+      <table>
+        <search base="filtered_base">
+          <query>
+            | lookup ctf_questions Number OUTPUT Title
+            | stats values(Title) as question, count by Number
+            | sort - count
+            | head 3
+            | fields - Number
+            | rename question as "Question", count as "Times Incorrect"
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+  <row id="player_timeline">
+    <panel>
+      <title>Question Path</title>
+      <viz type="simpletimeseries_app.simpletimeseries">
+        <search base="filtered_base">
+          <query>
+            |search Result!="Hint"
+            |rename Number as "Question Number" 
+            |eval color=if(Result="Incorrect","red","green") 
+            |table _time Result "Question Number" color
+          </query>
+        </search>
+        <option name="height">757</option>
+        <option name="simpletimeseries_app.simpletimeseries.showDatapoints">true</option>
+        <option name="simpletimeseries_app.simpletimeseries.showLegend">false</option>
+      </viz>
+    </panel>
+  </row>
+  <row id="player_actions">
+    <panel>
+      <title>Question Details</title>
+      <table>
+        <search base="filtered_base">
+          <query>|lookup ctf_questions Number OUTPUT Title, Category 
+|table _time, Number, Title, Category, Answer, OfficialAnswer, Result
+| sort - _time
+| rename Answer as "Answer Submitted", OfficialAnswer as "Correct Answer"</query>
+        </search>
+        <option name="count">25</option>
+        <option name="refresh.display">progressbar</option>
+        <format type="color" field="Result">
+          <colorPalette type="map">{"Correct":#008000,"Incorrect":#FF0000, "Hint":#4682B4}</colorPalette>
+        </format>
+      </table>
+    </panel>
+  </row>
+</form>
